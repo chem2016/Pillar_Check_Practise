@@ -82,7 +82,7 @@ const syncAndSeed = async() => {
     
     // how to do this with normal promise??? promise.resovle? 
     
-    //const company1 = await Company.create({name: 'Acme', Bio: 'Provide Web Study', Years: 5})
+    //const company1 = await Company.create({oname: 'Acme', Bio: 'Provide Web Study', Years: 5})
     
     //const company1 = await Promise.resolve(Company.create({name: 'Acme', Bio: 'Provide Web Study', Years: 5}))
 
