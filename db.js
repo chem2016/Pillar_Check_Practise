@@ -17,9 +17,19 @@ const Employee = conn.define('employee',{
     salary: {
         type: Sequelize.INTEGER,
         
-    }
+    },
+    age: {
+        type: Sequelize.INTEGER,
+    },
+    //????????
+    // hooks:{
+    //     beforeCreate: (employee, options) => {
+    //         employee.age = 30;
+    //     }
+    // }
 })
 
+// is this correct? it invoke at create? 
 Employee.beforeCreate((employeeInstance, optionObject)=>{
     if(!employeeInstance.salary){
         employeeInstance.salary = 50000
@@ -47,7 +57,7 @@ Employee.belongsTo(Company)
 
 // create employees and companies
 employees = [
-    {name: 'moe', favoriteNum: [7,8,9], salary: 100000},
+    {name: 'moe', favoriteNum: [7,8,9]},
     {name: 'curly', favoriteNum: [10,11,12], salary: 105000},
     {name: 'larry', favoriteNum: [13,14,15], salary: 200000},
 ];
@@ -55,10 +65,13 @@ employees = [
 
 // syncAndSeed
 const syncAndSeed = async() => {
-    Company.hasMany(Employee);
+    try{
+        Company.hasMany(Employee);
     Employee.belongsTo(Company);
     await conn.sync({force: true})
-
+    await Promise.all([
+        Company.create({name: 'Acme', Bio: 'Provide Web Study', Years: 5})
+    ])
     //? how to use map here
     const [moe, curly, larry] = await Promise.all([
         Employee.create(employees[0]),
@@ -66,12 +79,12 @@ const syncAndSeed = async() => {
         Employee.create(employees[2]),
     ])
     
-    // how to do this with normal promise??? promise.resovle? 
-    // await Promise.all([
-    //     Company.create({name: 'Acme', Bio: 'Provide Web Study', Years: 5})
-    // ])
     
-    const company1 = await Promise.resolve(Company.create({name: 'Acme', Bio: 'Provide Web Study', Years: 5}))
+    // how to do this with normal promise??? promise.resovle? 
+    
+    //const company1 = await Company.create({name: 'Acme', Bio: 'Provide Web Study', Years: 5})
+    
+    //const company1 = await Promise.resolve(Company.create({name: 'Acme', Bio: 'Provide Web Study', Years: 5}))
 
         // .then(Employee.findAll())
         // .then((employees)=>{
@@ -79,16 +92,32 @@ const syncAndSeed = async() => {
         // })
     //console.log(moe.get())
     //console.log(company1.get())
+    // const pugsWithTheirOwners = await Pug.findAll({
+    //     include: [{model: Owner}]
+    //   })
+    }
+    catch(err){
+        console.log(`company err!!!!!!!!!!!!!${err}`)
+    } 
 }
 
 syncAndSeed()
-    // .then(()=>{ return Employee.findAll()})
-    // .then((employees)=>{
-    //     console.log(employees)
-    // }) ??????????? can't i do it here
+    // .then(()=>{return Employee.findAll()})
+    // .then((employees)=>console.log(employees.length))
+    // .catch((err)=>{console.log(err)})
+    // .then((employees)=>{})
+    .then(()=>{ return Employee.findAll(
+        {where: {
+            name: {$like: '%u%y%'}                         //? how to like?
+        }}
+    )})
+    .then((employees)=>{
+        console.log(employees[0].get())
+    }) 
     
-    Employee.findAll({
-    where: {
-        name: 'moe',
-    }
-})
+    
+    // Employee.findAll({
+    // where: {
+    //     name: 'moe',
+    // }
+// })
